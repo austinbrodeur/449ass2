@@ -23,7 +23,7 @@ public class EArgs
     }
     else if (argsList.length == 1)
     {
-      if ((argsList[0].equals("-h")) || (argsList[1].equals("-?")) || (argsList[1].equals("--help"))) // If first arg is for help
+      if ((argsList[0].equals("-h")) || (argsList[1].equals("-?")) || (argsList[1].equals("--help") || argsList[1].equals("--HELP"))) // If first arg is for help
       {
         System.out.println(helpText + synoText);
       }
@@ -45,7 +45,7 @@ public class EArgs
     }
     else if (argsList.length == 3) // Checks for qualifiers
     {
-      if ((argsList[0].equals("-v")) || (argsList[0].equals("--verbose"))) // For verbose mode
+      if ((argsList[0].equals("-v")) || (argsList[0].equals("--verbose") || argsList[0].equals("--VERBOSE"))) // For verbose mode
       {
         System.out.println("Verbose mode"); // Code for verbose mode here
       }
