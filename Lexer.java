@@ -29,14 +29,14 @@ public class Lexer
     {
       return String.format("(%s %s)", type.name(), data);
     }
-
   }
 
   public static enum TokenType
   {
-    CHAR("[a-zA-Z]"), DIGIT("[0-9]"), WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"), ERROR(".+");
+    CHAR("[a-zA-Z]"), DIGIT("[0-9]"), WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"),
+    QUOTE("[\"]"), PLUS("[+]"), MINUS("[-]"), DOT("[.]"), ERROR(".+");
 
-    //"
+  //"
 
     public final String pattern;
 
