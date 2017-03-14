@@ -67,34 +67,3 @@ public class Parser
     printNode(root);
   }
 
-
-
-// The following code is for the Node class only
-  public class Node
-  {
-    public Node leftChild;
-    public Node rightChild;
-    public Node parent;
-    public Lexer.Token token;
-
-    public Node()
-    {
-    }
-
-    public Node(Lexer.Token aToken){
-      token = aToken;
-    }
-
-    public void createLeftChild()
-    {
-      leftChild = new Node();
-      leftChild.parent = this;
-    }
-
-    public void createRightChild()
-    {
-      rightChild = new Node();
-      rightChild.parent = this;
-    }
-  }
-}
