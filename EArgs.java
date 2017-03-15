@@ -107,7 +107,6 @@ public class EArgs
       }
     } while (true);
   }
-  
   public void matchingError(int offset, String expr){
 	System.out.println("Matching function for '" + expr + "not found at offset" + offset);
 	System.out.println(expr);
@@ -116,8 +115,8 @@ public class EArgs
 	      }
 	System.out.println("^");
 }	
-		
-public void unexpectedError(int offset, String expr){
+	
+  public void unexpectedError(int offset, String expr){
 	System.out.println("Unexpected character encountered at offset" + offset);
 	System.out.println(expr);
 	while(i=0; i<offset-1; i++;){
