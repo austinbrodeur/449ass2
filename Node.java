@@ -3,8 +3,8 @@
 public class Node {
 
 	//Class variables
-	private Lexer.Token token;
-	private Node parent, child = null;
+	private final Lexer.Token token;
+	private final Node parent, child = null;
 
 	//Constructor
 	public Node(Lexer.Token token, Node parent) {
@@ -22,12 +22,17 @@ public class Node {
 		return child;
 	}
 
-	//Returns the parent of this project.
+	//Returns the parent of this node.
 	public Node getParent() {
 		return parent;
 	}
 
-	public void setToken(Lexer.Token aToken) {
-		token = aToken;
+	public void setToken(Lexer.Token token) {
+		this.token = token;
+	}
+	
+	//Return the token of this node.
+	public Lexer.Token getToken() {
+		return token;
 	}
 }
