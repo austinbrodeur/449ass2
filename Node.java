@@ -1,4 +1,3 @@
-
 //Class representation for a Node object.
 public class Node {
 
@@ -27,6 +26,7 @@ public class Node {
 		return parent;
 	}
 
+	//Sets the token for this node.
 	public void setToken(Lexer.Token token) {
 		this.token = token;
 	}
