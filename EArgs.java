@@ -1,8 +1,11 @@
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class EArgs
 {
+  private Lexer aLex;
+  private Parser aParse;
+
   private Scanner s = new Scanner(System.in);
 
   private String helpText = "Synopsis:\n  methods\n  methods { -h | -? | --help }+\n  methods {-v --verbose}* <jar-file> [<class-name>]\nArguments:\n  <jar-file>:   The .jar file that contains the class to load (see next line).\n  <class-name>: The fully qualified class name containing public static command methods to call. [Default=\"Commands\"]\nQualifiers:\n  -v --verbose: Print out detailed errors, warning, and tracking.\n  -h -? --help: Print out a detailed help message.\nSingle-char qualifiers may be grouped; long qualifiers may be truncated to unique prefixes and are not case sensitive.";
@@ -23,24 +26,29 @@ public class EArgs
     }
     else if (argsList.length == 1)
     {
-      if ((argsList[0].equals("-h")) || (argsList[1].equals("-?")) || (argsList[1].equals("--help") || argsList[1].equals("--HELP"))) // If first arg is for help
+      if ((argsList[0].equals("-h")) || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))) // If first arg is for help
       {
         System.out.println(helpText + synoText);
       }
     }
     else if (argsList.length == 2)
     {
-      if (!(argsList[0].endsWith(".jar"))) // First arg ends with .jar
+      if (argsList[0].equals("-h") || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))){
+        System.err.println("Qualifier --help (-h, -?) should not appear with any command-line arguments.\n" + helpText);
+      }
+      else if (!(argsList[0].endsWith(".jar"))) // First arg ends with .jar
       {
-        System.out.println("This program requires a jar file as the first command line argument (after any qualifiers)." + synoText);
-        System.err.println("EXIT -3");
+        System.err.println("This program requires a jar file as the first command line argument (after any qualifiers)." + helpText);
         System.exit(-3);
       }
-      else if ((argsList[0].endsWith(".jar")))
-      {
-        // Check if .jar and .class exist
-        // If yes, start with that jar. If no, error (-5 exit code)
-        Menu();
+      else if ((argsList[0].endsWith(".jar"))){
+        if (checkJar(argsList[0])){
+          Menu();
+        }
+        else{
+          System.err.println("Could not load jar file: " + argsList[0]);
+          System.exit(-5);
+        }
       }
     }
     else if (argsList.length == 3) // Checks for qualifiers
@@ -52,17 +60,20 @@ public class EArgs
     }
   }
 
-  public Boolean CheckJar()
+  public Boolean checkJar(String fName)
   {
-    // Will check if a .jar file exists
-    return true;
+    File f = new File(fName);
+    if (f.exists() && !f.isDirectory()){
+      return true;
+    }
+    return false;
   }
 
   public void Menu()
   {
+    System.out.println(menuText);
     do
     {
-      System.out.println(menuText);
       System.out.print(">");
       String choice;
       choice = s.next();
@@ -77,12 +88,12 @@ public class EArgs
 
         case "v":
         case "V":
-        // Toggle verbose
+        System.out.println("Toggle verbose");
         break;
 
         case "f":
         case "F":
-
+        System.out.println("Print list of all functions");
         break;
 
         case "?":
@@ -90,7 +101,8 @@ public class EArgs
         break;
 
         default:
-        System.out.println("Evaluate expression");
+        aLex = new Lexer();
+        aParse = new Parser(Lexer.lex(choice));
         break;
       }
     } while (true);

@@ -7,13 +7,6 @@ import java.util.regex.Matcher;
 public class Lexer
 {
 
-  public Lexer(String input)
-  {
-    ArrayList<Token> tokens = lex(input);
-    for (Token token : tokens)
-      System.out.println(token);
-  }
-
   public static class Token
   {
     public TokenType type;
@@ -33,10 +26,8 @@ public class Lexer
 
   public static enum TokenType
   {
-    CHAR("[a-zA-Z]"), DIGIT("[0-9]"), WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"),
-    QUOTE("[\"]"), PLUS("[+]"), MINUS("[-]"), DOT("[.]"), ERROR(".+");
-
-  //"
+    WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"), PLUS("[+]"),
+    MINUS("[-]"), DOT("[.]"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[^\\s]+"), ERROR(".+");
 
     public final String pattern;
 
