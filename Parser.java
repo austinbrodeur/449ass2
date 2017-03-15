@@ -29,14 +29,24 @@ public class Parser
         cNode = cNode.getChild();
         continue;
       }
-      if (cToken.type.name().equals("ALPHA")) {
+      if (cToken.type.name().equals("ID")) {
         cNode.setToken(cToken);
         cNode.createChild(null);
         cNode = cNode.getChild();
         continue;
       }
+      if (cToken.type.name().equals("INTEGER") || cToken.type.name().equals("STRING")) {
+        if (cNode.getToken() != null) {
+          cNode.createChild(null);
+          cNode = cNode.getChild();
+        }
+        cNode.setToken(cToken);
+        cNode = cNode.getParent();
+        continue;
+      }
       if (cToken.type.name().equals("RPAR")) {
-
+        cNode = cNode.getParent();
+        continue;
       }
     }
   }
