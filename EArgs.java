@@ -107,6 +107,9 @@ public class EArgs
       }
     } while (true);
   }
+		//These two function is called when the function cxall does not match any available
+		//functions in the jar file. It prints a message, the exoression, and a line 
+		//pointing to the offset where the error was found.
   public void matchingError(int offset, String expr){
 	System.out.println("Matching function for '" + expr + "not found at offset" + offset);
 	System.out.println(expr);
