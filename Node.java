@@ -22,6 +22,11 @@ public class Node {
 		final rightChild = new Node(token, this);
 	}
 	
+	//Returns the token of this node.
+	private Lexer.Token getToken() {
+		return token;
+	}
+	
 	//Returns the left child of this node.
 	private Node getLeftChild() {
 		return leftChild;
