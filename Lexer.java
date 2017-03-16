@@ -27,7 +27,7 @@ public class Lexer
   public static enum TokenType
   {
     WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"), PLUS("[+]"),
-    MINUS("[-]"), DOT("[.]"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[^\\s]+"), ERROR(".+");
+    MINUS("[-]"), FLOAT("\\d*\\.\\d+"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[^\\s]+"), ERROR(".+");
 
     public final String pattern;
 
