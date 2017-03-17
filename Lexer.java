@@ -11,16 +11,18 @@ public class Lexer
   {
     public TokenType type;
     public String data;
+    public int offset;
 
-    public Token(TokenType type, String data)
+    public Token(TokenType type, String data, int offset)
     {
       this.type = type;
       this.data = data;
+      this.offset = offset;
     }
 
     public String toString()
     {
-      return String.format("(%s %s)", type.name(), data);
+      return String.format("(%s %s %d)", type.name(), data, offset);
     }
   }
 
@@ -55,7 +57,7 @@ public class Lexer
           continue;
         else if (matcher.group(tk.name()) != null)
         {
-          tokens.add(new Token(tk, matcher.group(tk.name())));
+          tokens.add(new Token(tk, matcher.group(tk.name()), matcher.start()));
           continue;
         }
       }
