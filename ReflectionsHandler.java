@@ -1,11 +1,14 @@
 import java.lang.reflect.*;
 import java.util.ArrayList;
 
+//This class represents a handler for the runtime method calls using the Reflection API.
 public class ReflectionsHandler {
 	
+	//Variable declarations.
 	private Class<?> objClass;
 	private Method[] methods;
 	
+	//CONSTRUCTOR
 	public ReflectionsHandler(String objName) {
 		try {
 			objClass = Class.forName(objName);
@@ -62,6 +65,11 @@ public class ReflectionsHandler {
 		for (Method method : methods) {
 			if (method.getName().equals(name)) return method;
 		} throw new NoSuchMethodException();
+	}
+	
+	//Returns the number of parameters for a given method.
+	public int paramCount(String name) throws NoSuchMethodException {
+		return findMethod(name).getParameterTypes().length;
 	}
 	
 	//Class test.
