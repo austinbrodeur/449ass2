@@ -10,7 +10,8 @@ public class Parser
     Parse(tokens);
   }
 
-  public void Parse(ArrayList<Lexer.Token> tokens) // unfinished. Still needs to handle all types
+  // One of the rules is still broken when testing multi-embedded functions
+  public void Parse(ArrayList<Lexer.Token> tokens)
   {
     int tokensSize = (tokens.size()-1);
     Lexer.Token cToken;
@@ -19,13 +20,20 @@ public class Parser
 
     for (int i = 0; i <= tokensSize; i++){
       cToken = tokens.get(i);
-
-      if (cToken.type.name().equals("ERROR")) {
-        System.err.println("Lex error. Unrecognized symbol \"" + cToken.data + "\"");
-        System.exit(0);
+      if (cToken.type.name().equals("ERROR")) { //
+        System.err.println("Unexpected character found");
+        continue;
       }
       if (cToken.type.name().equals("LPAR")) {
-        cNode.createChild(null);
+        if (cNode.getChild() != null) {
+          Node temp = cNode.getChild();
+          cNode.createChild(temp.getToken());
+          cNode.getChild().setChild(temp);
+          cNode = cNode.getChild();
+        }
+        else {
+          cNode.createChild(null);
+        }
         cNode = cNode.getChild();
         continue;
       }
@@ -35,10 +43,18 @@ public class Parser
         cNode = cNode.getChild();
         continue;
       }
-      if (cToken.type.name().equals("INTEGER") || cToken.type.name().equals("STRING")) {
+      if (cToken.type.name().equals("INTEGER") || cToken.type.name().equals("STRING") || cToken.type.name().equals("FLOAT")) {
         if (cNode.getToken() != null) {
-          cNode.createChild(null);
-          cNode = cNode.getChild();
+          if (cNode.getChild() != null) {
+            Node temp = cNode.getChild();
+            cNode.createChild(null);
+            cNode.getChild().setChild(temp);
+            cNode = cNode.getChild();
+          }
+          else {
+            cNode.createChild(null);
+            cNode = cNode.getChild();
+          }
         }
         cNode.setToken(cToken);
         cNode = cNode.getParent();
@@ -49,9 +65,47 @@ public class Parser
         continue;
       }
     }
+    printParse();
   }
 
-  // Production rules
+
+  public void traverseTree()
+  {
+    Node cNode = root;
+    ArrayList<String> result = new ArrayList<String>();
+
+    do {
+      if (cNode.getToken() == null)
+      {
+
+      }
+    } while ();
+  }
+
+  public void evaluateTree()
+  {
+    
+  }
+
+  // For debugging parse traversal
+  public void printParse()
+  {
+    Node cNode = root;
+
+    do {
+      if (cNode.getToken() != null) {
+        System.out.println(cNode.getToken().data + " in node " + cNode);
+      }
+      else {
+        System.out.println("Node " + cNode + " is empty.");
+      }
+      if (cNode.getChild() == null) {
+        System.out.println("Node " + cNode + " has no child. Terminating traversal..");
+        break;
+      }
+      cNode = cNode.getChild();
+    } while (true);
+  }
 
 
 }
