@@ -3,8 +3,11 @@ import java.util.Scanner;
 
 public class EArgs
 {
+  private Class<?> aClass;
+
   private Lexer aLex;
   private Parser aParse;
+  private ReflectionsHandler aHandler;
 
   private Scanner s = new Scanner(System.in);
 
@@ -12,25 +15,27 @@ public class EArgs
   private String synoText = "\n\nThis program interprets commands of the format '(<method> {arg}*)' on the command line, finds corresponding\nmethods in <class-name>, and executes them, printing the result to sysout.";
   private String menuText = "\nq           : Quit the program.\nv           : Toggle verbose mode (stack traces).\nf           : List all known functions.\n?           : Print this helpful text.\n<expression>: Evaluate the expression.\nExpressions can be integers, floats, strings (surrounded in double quotes) or function\ncalls of the form '(identifier {expression}*)'.";
 
-	
-
   // Takes in list of command line arguments and performs error checking.
   public EArgs(String argsList[])
   {
     if (argsList.length > 3)
     {
-      System.out.println("This program takes at most two command line arguments."); // Too many args
+      System.err.println("This program takes at most two command line arguments."); // Too many args
       System.exit(-2);
     }
     else if (argsList.length == 0)
     {
-      System.out.println(helpText); // Prints program use and takes in no arguments
+      System.err.println(helpText); // Prints program use and takes in no arguments
     }
     else if (argsList.length == 1)
     {
       if ((argsList[0].equals("-h")) || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))) // If first arg is for help
       {
-        System.out.println(helpText + synoText);
+        System.err.println(helpText + synoText);
+      }
+      else
+      {
+        System.err.println("Not enough command line arguments provided.\n" + helpText);
       }
     }
     else if (argsList.length == 2)
@@ -45,6 +50,7 @@ public class EArgs
       }
       else if ((argsList[0].endsWith(".jar"))){
         if (checkJar(argsList[0])){
+          aHandler = new ReflectionsHandler("SiberianWarLlama");
           Menu();
         }
         else{
@@ -76,7 +82,7 @@ public class EArgs
     System.out.println(menuText);
     do
     {
-      System.out.print(">");
+      System.out.print("> ");
       String choice;
       choice = s.next();
 
@@ -90,12 +96,12 @@ public class EArgs
 
         case "v":
         case "V":
-        System.out.println("Toggle verbose");
+        Mode.toggle();
         break;
 
         case "f":
         case "F":
-        System.out.println("Print list of all functions");
+        aHandler.functionList();
         break;
 
         case "?":
@@ -104,35 +110,29 @@ public class EArgs
 
         default:
         aLex = new Lexer();
-        aParse = new Parser(Lexer.lex(choice));
+        aParse = new Parser(aHandler, choice); // Filled with dummy class
         break;
       }
     } while (true);
   }
-		//These two function is called when the function call does not match any available
-		//functions in the jar file. It prints a message, the expression, and a line 
+		//These two function is called when the function cxall does not match any available
+		//functions in the jar file. It prints a message, the exoression, and a line
 		//pointing to the offset where the error was found.
-  public void matchingError(int offset, String expr, Exception e){
-	System.out.println("Matching function for '" + expr + "not found at offset" + offset);
-	System.out.println(expr);
-	while(i=0; i<offset-1; i++;){
-	      System.out.println("-");
-	      }
-	System.out.println("^");
-	if(verboseIndicator == 1){
-		e.printStackTrace(System.out);
-	}
-}	
-	
-  public void unexpectedError(int offset, String expr, Exception e){
-	System.out.println("Unexpected character encountered at offset" + offset);
-	System.out.println(expr);
-	while(i=0; i<offset-1; i++;){
-		System.out.println("-");
-	   	}
-	System.out.println("^");
-	  if(verboseIndicator == 1){
-		  e.printStackTrace(System.out);
-	  }
+  public void matchingError(int offset, String expr){
+  	System.out.println("Matching function for '" + expr + "not found at offset" + offset);
+  	System.out.println(expr);
+  	for(int i=0; i < (offset-1); i++){
+  	  System.out.println("-");
+  	  }
+  	System.out.println("^");
 }
+
+  public void unexpectedError(int offset, String expr){
+  	System.out.println("Unexpected character encountered at offset" + offset);
+  	System.out.println(expr);
+  	for(int i=0; i < (offset-1); i++){
+  		System.out.println("-");
+  	  }
+  	System.out.println("^");
+  }
 }
