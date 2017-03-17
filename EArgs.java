@@ -12,7 +12,6 @@ public class EArgs
   private String synoText = "\n\nThis program interprets commands of the format '(<method> {arg}*)' on the command line, finds corresponding\nmethods in <class-name>, and executes them, printing the result to sysout.";
   private String menuText = "\nq           : Quit the program.\nv           : Toggle verbose mode (stack traces).\nf           : List all known functions.\n?           : Print this helpful text.\n<expression>: Evaluate the expression.\nExpressions can be integers, floats, strings (surrounded in double quotes) or function\ncalls of the form '(identifier {expression}*)'.";
 
-  public static int verboseIndicator;	
 	
 
   // Takes in list of command line arguments and performs error checking.
@@ -92,11 +91,6 @@ public class EArgs
         case "v":
         case "V":
         System.out.println("Toggle verbose");
-	if(verboseIndicator == 1){
-		verboseIndicator = 0;
-	}else{
-	verboseIndicator = 1; 
-	}    
         break;
 
         case "f":
