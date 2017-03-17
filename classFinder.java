@@ -3,14 +3,15 @@ import java.util.*;
 import java.io.*;
 
 public class classFinder{
-
+ public static int i=0;
+ public static Class<?> objClass;
  private classFinder() {}
 
- public static List getClasseNamesInPackage(String jarName){
+
+ public static Object getClassNamesInPackage(String jarName, String desiredClass){
    ArrayList classes = new ArrayList ();
    try{
-     JarInputStream jarFile = new JarInputStream
-        (new FileInputStream (jarName));
+     JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
      JarEntry jarEntry;
 
      while(true) {
@@ -26,5 +27,11 @@ public class classFinder{
    catch(Exception e){
      e.printStackTrace ();
    }
-   return classes;
+   System.out.println(classes);
+   for(i=0; i<classes.size(); i++){
+     if(classes.get(i).equals(desiredClass)){
+
+     }
+   }
+   return objClass;
 }
