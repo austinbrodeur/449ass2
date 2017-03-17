@@ -12,6 +12,9 @@ public class EArgs
   private String synoText = "\n\nThis program interprets commands of the format '(<method> {arg}*)' on the command line, finds corresponding\nmethods in <class-name>, and executes them, printing the result to sysout.";
   private String menuText = "\nq           : Quit the program.\nv           : Toggle verbose mode (stack traces).\nf           : List all known functions.\n?           : Print this helpful text.\n<expression>: Evaluate the expression.\nExpressions can be integers, floats, strings (surrounded in double quotes) or function\ncalls of the form '(identifier {expression}*)'.";
 
+  public static int verboseIndicator;	
+	
+
   // Takes in list of command line arguments and performs error checking.
   public EArgs(String argsList[])
   {
@@ -89,6 +92,11 @@ public class EArgs
         case "v":
         case "V":
         System.out.println("Toggle verbose");
+	if(verboseIndicator == 1){
+		verboseIndicator = 0;
+	}else{
+	verboseIndicator = 1; 
+	}    
         break;
 
         case "f":
@@ -110,21 +118,27 @@ public class EArgs
 		//These two function is called when the function cxall does not match any available
 		//functions in the jar file. It prints a message, the exoression, and a line 
 		//pointing to the offset where the error was found.
-  public void matchingError(int offset, String expr){
+  public void matchingError(int offset, String expr, Exception e){
 	System.out.println("Matching function for '" + expr + "not found at offset" + offset);
 	System.out.println(expr);
 	while(i=0; i<offset-1; i++;){
 	      System.out.println("-");
 	      }
 	System.out.println("^");
+	if(verboseIndicator == 1){
+		e.printStackTrace(System.out);
+	}
 }	
 	
-  public void unexpectedError(int offset, String expr){
+  public void unexpectedError(int offset, String expr, Exception e){
 	System.out.println("Unexpected character encountered at offset" + offset);
 	System.out.println(expr);
 	while(i=0; i<offset-1; i++;){
 		System.out.println("-");
 	   	}
 	System.out.println("^");
+	  if(verboseIndicator == 1){
+		  e.printStackTrace(System.out);
+	  }
 }
 }
