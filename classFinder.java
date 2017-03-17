@@ -26,6 +26,5 @@ public class classFinder{
    catch(Exception e){
      e.printStackTrace ();
    }
-   System.out.println(classes);
    return classes;
 }
