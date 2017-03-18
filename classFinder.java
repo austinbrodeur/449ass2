@@ -28,13 +28,22 @@ public class classFinder{
    catch(Exception e){
      e.printStackTrace ();
    }
-   System.out.println(classes);
    for(i=0; i<classes.size(); i++){
      if(classes.get(i).equals(desiredClass)){
-      
-      //For some reason it can't find the tOURI() method
-       URLClassLoader child = new URLClassLoader (jarName.toURI().toURL());
-       Class objClass = Class.forName (desiredClass, true, child);
+       File f = new File(jarName);
+       URL[] jarURL = new URL[1];
+       try{
+         jarURL[0] = f.toURI().toURL();
+       }catch(Exception e){
+         System.out.println("Malformed URL");
+       }
+       URLClassLoader child = new URLClassLoader (jarURL);
+       try{
+         desiredClass.replace(".class", "");
+         Class objClass = Class.forName (desiredClass.substring(0, desiredClass.length()-6), true, child);
+       }catch(Exception e){
+         System.out.println("Class not found");
+       }
      }
    }
    return objClass;
