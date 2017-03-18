@@ -4,10 +4,18 @@ import java.util.Queue;
 public class Parser
 {
   private Node root = new Node(null, null);
+  private String iString;
+  private ReflectionsHandler handler;
+  private Lexer aLex;
+  private ArrayList<Lexer.Token> result = new ArrayList<Lexer.Token>();
+  private ArrayList<Lexer.Token> evalList = new ArrayList<Lexer.Token>();
 
-  public Parser(ArrayList<Lexer.Token> tokens)
+  public Parser(ReflectionsHandler aHandler, String input)
   {
-    Parse(tokens);
+    iString = input;
+    aLex = new Lexer();
+    handler = aHandler;
+    Parse(aLex.lex(input));
   }
 
   // One of the rules is still broken when testing multi-embedded functions
@@ -16,7 +24,7 @@ public class Parser
     int tokensSize = (tokens.size()-1);
     Lexer.Token cToken;
     Node cNode = root;
-    System.out.println(tokens);
+    //System.out.println(tokens);#####################
 
     for (int i = 0; i <= tokensSize; i++){
       cToken = tokens.get(i);
@@ -57,7 +65,6 @@ public class Parser
           }
         }
         cNode.setToken(cToken);
-        cNode = cNode.getParent();
         continue;
       }
       if (cToken.type.name().equals("RPAR")) {
@@ -65,26 +72,150 @@ public class Parser
         continue;
       }
     }
-    printParse();
+    traverseTree();
+    //printParse();#############################
+    try {
+      System.out.println(evaluateTree(evalList));
+    }
+    catch (Exception e)
+    {
+      System.err.println("Error calling evaluateTree");
+    }
   }
-
 
   public void traverseTree()
   {
     Node cNode = root;
-    ArrayList<String> result = new ArrayList<String>();
 
     do {
-      if (cNode.getToken() == null)
+      if (cNode.getToken() != null)
       {
-
+        result.add(cNode.getToken());
+        evalList.add(cNode.getToken());
       }
-    } while ();
+      if (cNode.getChild() == null) {
+        break;
+      }
+      else {
+        cNode = cNode.getChild();
+      }
+    } while (true);
   }
 
-  public void evaluateTree()
+  public String evaluateTree(ArrayList<Lexer.Token> evalList) throws NoSuchMethodException
   {
-    
+    ArrayList<Lexer.Token> exprTemp = new ArrayList<Lexer.Token>();
+    ArrayList<String> strTemp;
+    int treeSize = (evalList.size()-1);
+    int funcPos;
+    int numArgs;
+    Lexer.Token temptoken;
+    Lexer.Token temp;
+    Lexer.Token tempPar;
+
+    System.out.println(result);
+    if (hasFunc(result) == false) {
+      return iString;
+    }
+
+    if (treeSize+1 == 1)
+    {
+      return evalList.get(0).data;
+    }
+
+    for (int i = 0; i <= treeSize; i++)
+    {
+      temp = result.get(i);
+      if (temp.type.name().equals("ID")) { // Needs to be able to know if there are more function calls in the rest of the input list. If yes, call this. If no, call some other block of code.
+        try {
+          handler.findMethod(temp.data);
+        }
+        catch (NoSuchMethodException e) {
+          System.err.println("Matching function for \"" + temp.data + "\" (offset " + temp.offset + ") not found.");
+        }
+        numArgs = handler.paramCount(temp.data);
+        if (hasFuncParams(i, numArgs, evalList) == false) {
+          strTemp = makeStringlist(evalList);
+          return (handler.evaluate(strTemp)).toString();
+        }
+        else if(hasFuncParams(i, numArgs, evalList) == true) {
+          System.out.println("Evaluating with params..");
+          makeTokList(funcAt(i, numArgs, evalList), numArgs, evalList);
+        }
+      }
+    }
+    return "Error evaluating given expression";
+  }
+
+  public boolean hasFunc(ArrayList<Lexer.Token> list)
+  {
+    int treeSize = (list.size()-1);
+    Lexer.Token temp;
+
+    for (int i = 0; i <= treeSize; i++)
+    {
+      temp = list.get(i);
+      if (temp.type.name().equals("ID"))
+        return true;
+    }
+    return false;
+  }
+
+
+  // Generates subexpression for a function that has no functions as arguments, so it can be directly evaluated.
+  public ArrayList<String> makeStringlist(ArrayList<Lexer.Token> tlist)
+  {
+    ArrayList<String> aList = new ArrayList<String>();
+    int size = tlist.size();
+    String temp;
+
+    for (int i = 0; i < size; i++)
+    {
+      temp = tlist.get(i).data;
+      aList.add(temp);
+    }
+    return aList;
+  }
+
+  // Generates subexpression for a function that has a function call as an argument. This is recursively called by evaluateTree.
+  public ArrayList<Lexer.Token> makeTokList(int index, int numParams, ArrayList<Lexer.Token> tlist)
+  {
+    ArrayList<Lexer.Token> aList = new ArrayList<Lexer.Token>();
+    int size = tlist.size();
+    Lexer.Token temp;
+
+    for (int i = index+1; i <= (index + numParams); i++)
+    {
+      temp = tlist.get(i);
+      aList.add(temp);
+    }
+    return aList;
+  }
+
+  public boolean hasFuncParams(int index, int numParams, ArrayList<Lexer.Token> list)
+  {
+    Lexer.Token temp;
+    for (int i = index+1; i <= (index + numParams); i++)
+    {
+      temp = list.get(i);
+      if (temp.type.name().equals("ID")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public int funcAt(int index, int numParams, ArrayList<Lexer.Token> list)
+  {
+    Lexer.Token temp;
+    for (int i = index+1; i<= (index + numParams); i++)
+    {
+      temp = list.get(i);
+      if (temp.type.name().equals("ID")) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   // For debugging parse traversal
