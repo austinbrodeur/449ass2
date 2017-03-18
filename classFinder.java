@@ -9,7 +9,7 @@ public class classFinder{
  private classFinder() {}
 
 
- public static Object getClassNamesInPackage(String jarName, String desiredClass){
+ public static Class<?> getClassNamesInPackage(String jarName, String desiredClass){
    ArrayList classes = new ArrayList ();
    try{
      JarInputStream jarFile = new JarInputStream(new FileInputStream(jarName));
