@@ -31,7 +31,9 @@ public class classFinder{
    for(i=0; i<classes.size(); i++){
      if(classes.get(i).equals(desiredClass)){
       
-     //Not sure how to implement this section to generate the proper objClass
+      //For some reason it can't find the tOURI() method
+       URLClassLoader child = new URLClassLoader (jarName.toURI().toURL());
+       Class objClass = Class.forName (desiredClass, true, child);
      }
    }
    return objClass;
