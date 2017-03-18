@@ -36,6 +36,7 @@ public class EArgs
       else
       {
         System.err.println("Not enough command line arguments provided.\n" + helpText);
+	System.exit(-4);
       }
     }
     else if (argsList.length == 2)
