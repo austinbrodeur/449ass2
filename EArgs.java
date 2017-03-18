@@ -54,7 +54,7 @@ public class EArgs
           Menu();
         }
         else{
-          System.err.println("Could not load jar file: " + argsList[0]);
+          System.err.println("Could not load jar file: " + argsList[0] + "\n" + helpText);
           System.exit(-5);
         }
       }
@@ -84,7 +84,7 @@ public class EArgs
     {
       System.out.print("> ");
       String choice;
-      choice = s.next();
+      choice = s.nextLine().toString();
 
       switch(choice)
       {
