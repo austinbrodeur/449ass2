@@ -15,7 +15,7 @@ public class ReflectionsHandler {
 			methods = objClass.getMethods();
 		} catch (Exception e) {
 			System.err.println("Could not find class: " + objName);
-			System.exit(0);
+			System.exit(-6);
 		}
 	}
 	
