@@ -28,7 +28,7 @@ public class EArgs
       System.err.println(helpText); // Prints program use and takes in no arguments
     }
     else if (argsList.length == 1)
-    {
+    {            
       if ((argsList[0].equals("-h")) || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))) // If first arg is for help
       {
         System.err.println(helpText + synoText);
@@ -36,7 +36,6 @@ public class EArgs
       else
       {
         System.err.println("Not enough command line arguments provided.\n" + helpText);
-	System.exit(-4);
       }
     }
     else if (argsList.length == 2)
@@ -44,29 +43,53 @@ public class EArgs
       if (argsList[0].equals("-h") || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))){
         System.err.println("Qualifier --help (-h, -?) should not appear with any command-line arguments.\n" + helpText);
       }
-      else if (!(argsList[0].endsWith(".jar"))) // First arg ends with .jar
+      else if (!(argsList[1].endsWith(".jar"))) // second arg ends with .jar
       {
         System.err.println("This program requires a jar file as the first command line argument (after any qualifiers)." + helpText);
         System.exit(-3);
       }
-      else if ((argsList[0].endsWith(".jar"))){
-        if (checkJar(argsList[0])){
-          aHandler = new ReflectionsHandler("SiberianWarLlama");
+      else if ((argsList[1].endsWith(".jar"))){
+//        if (checkJar(argsList[1])) {
+        	/*
+          aHandler = new ReflectionsHandler(argsList[0], argsList[1]);
           Menu();
         }
-        else{
-          System.err.println("Could not load jar file: " + argsList[0] + "\n" + helpText);
+        else {*/
+      
+          System.err.println("Could not load jar file: " + argsList[1] + "\n" + helpText);
           System.exit(-5);
-        }
+  //      }
+            
       }
     }
     else if (argsList.length == 3) // Checks for qualifiers
     {
-      if ((argsList[0].equals("-v")) || (argsList[0].equals("--verbose") || argsList[0].equals("--VERBOSE"))) // For verbose mode
+		if (argsList[0].equals("-h") || (argsList[0].equals("-?")) || (argsList[0].equals("--help") || argsList[0].equals("--HELP"))){
+        System.err.println("Qualifier --help (-h, -?) should not appear with any command-line arguments.\n" + helpText);
+      }
+		else if ((argsList[0].equals("-v")) || (argsList[0].equals("--verbose") || argsList[0].equals("--VERBOSE"))) // For verbose mode
       {
         System.out.println("Verbose mode"); // Code for verbose mode here
       }
-    }
+      else if (!(argsList[1].endsWith(".jar"))) // First arg ends with .jar
+      {
+        System.err.println("This program requires a jar file as the first command line argument (after any qualifiers)." + helpText);
+        System.exit(-3);
+      }
+      else if ((argsList[1].endsWith(".jar"))){
+        if (checkJar(argsList[1])) {
+          aHandler = new ReflectionsHandler(argsList[1], argsList[2]);
+          Menu();
+        }
+        else {
+          System.err.println("Could not load jar file: " + argsList[1] + "\n" + helpText);
+          System.exit(-5);
+        }
+      }      
+      
+    
+
+}
   }
 
   public Boolean checkJar(String fName)
@@ -106,18 +129,20 @@ public class EArgs
         break;
 
         case "?":
-        System.out.println(helpText + synoText);
+        System.err.println(helpText + synoText);
         break;
 
         default:
-        aLex = new Lexer();
-        aParse = new Parser(aHandler, choice); // Filled with dummy class
+
+        Lexer aLex = new Lexer();
+        Parser aParse = new Parser(aHandler, choice); // Filled with dummy class
         break;
+
       }
     } while (true);
   }
-		//These two function is called when the function cxall does not match any available
-		//functions in the jar file. It prints a message, the exoression, and a line
+		//These two function is called when the function call does not match any available
+		//functions in the jar file. It prints a message, the expression, and a line
 		//pointing to the offset where the error was found.
   public void matchingError(int offset, String expr){
   	System.out.println("Matching function for '" + expr + "not found at offset" + offset);

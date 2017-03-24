@@ -13,9 +13,11 @@ public class Parser
   public Parser(ReflectionsHandler aHandler, String input)
   {
     iString = input;
-    aLex = new Lexer();
-    handler = aHandler;
+    Lexer aLex = new Lexer();
+    handler = aHandler;   
     Parse(aLex.lex(input));
+	  
+  
   }
 
   // One of the rules is still broken when testing multi-embedded functions
@@ -113,14 +115,9 @@ public class Parser
     Lexer.Token temp;
     Lexer.Token tempPar;
 
-    System.out.println(result);
+    System.out.println(evalList);
     if (hasFunc(result) == false) {
       return iString;
-    }
-
-    if (treeSize+1 == 1)
-    {
-      return evalList.get(0).data;
     }
 
     for (int i = 0; i <= treeSize; i++)
@@ -140,7 +137,7 @@ public class Parser
         }
         else if(hasFuncParams(i, numArgs, evalList) == true) {
           System.out.println("Evaluating with params..");
-          makeTokList(funcAt(i, numArgs, evalList), numArgs, evalList);
+          return(evaluateTree(makeTokList(funcAt(i, numArgs, evalList), numArgs, evalList)));
         }
       }
     }
@@ -184,7 +181,7 @@ public class Parser
     int size = tlist.size();
     Lexer.Token temp;
 
-    for (int i = index+1; i <= (index + numParams); i++)
+    for (int i = index; i <= (index + numParams); i++)
     {
       temp = tlist.get(i);
       aList.add(temp);

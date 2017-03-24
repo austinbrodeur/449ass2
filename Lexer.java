@@ -29,7 +29,7 @@ public class Lexer
   public static enum TokenType
   {
     WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"), PLUS("[+]"),
-    MINUS("[-]"), FLOAT("\\d*\\.\\d+"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[^\\s]+"), ERROR(".+");
+    MINUS("[-]"), FLOAT("\\d*\\.\\d+"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[\\w|_]+"), ERROR(".+");
 
     public final String pattern;
 
@@ -44,7 +44,7 @@ public class Lexer
     ArrayList<Token> tokens = new ArrayList<Token>();
 
     StringBuffer tokenPatternsBuffer = new StringBuffer();
-    for (TokenType tokenType : TokenType.values())
+    for (TokenType tokenType : TokenType.values())      
       tokenPatternsBuffer.append(String.format("|(?<%s>%s)", tokenType.name(), tokenType.pattern));
     Pattern tokenPatterns = Pattern.compile(new String(tokenPatternsBuffer.substring(1)));
 

@@ -6,8 +6,9 @@ import java.net.*;
 public class classFinder{
  public static int i=0;
  public static Class<?> objClass;
- private classFinder() {}
-
+ public classFinder()
+ {
+ }
 
  public static Class<?> getClassNamesInPackage(String jarName, String desiredClass){
    ArrayList classes = new ArrayList ();
