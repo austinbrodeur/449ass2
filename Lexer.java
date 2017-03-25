@@ -3,46 +3,42 @@
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
 public class Lexer
 {
-
-  public Lexer(String input)
-  {
-    ArrayList<Token> tokens = lex(input);
-    for (Token token : tokens)
-      System.out.println(token);
-  }
 
   public static class Token
   {
     public TokenType type;
     public String data;
+    public int offset;
 
-    public Token(TokenType type, String data)
+    public Token(TokenType type, String data, int offset)
     {
       this.type = type;
       this.data = data;
+      this.offset = offset;
     }
 
     public String toString()
     {
-      return String.format("(%s %s)", type.name(), data);
+      return String.format("(%s %s %d)", type.name(), data, offset);
     }
   }
 
-  public static enum TokenType
+  public enum TokenType
   {
-    CHAR("[a-zA-Z]"), DIGIT("[0-9]"), WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"),
-    QUOTE("[\"]"), PLUS("[+]"), MINUS("[-]"), DOT("[.]"), ERROR(".+");
+    WHITESPACE("[ \t]+"), LPAR("[(]"), RPAR("[)]"), PLUS("[+]"),
+    MINUS("[-]"), FLOAT("\\d*\\.\\d+"), INTEGER("\\d+"), STRING("\"([^\"]*)\""), ID("[\\w|_]+"), ERROR(".+");
 
-  //"
+    private String pattern;
 
-    public final String pattern;
-
-    private TokenType(String pattern)
+    TokenType(String pattern)
     {
       this.pattern = pattern;
+    }
+    
+    public String pattern() {
+        return pattern;
     }
   }
 
@@ -51,8 +47,8 @@ public class Lexer
     ArrayList<Token> tokens = new ArrayList<Token>();
 
     StringBuffer tokenPatternsBuffer = new StringBuffer();
-    for (TokenType tokenType : TokenType.values())
-      tokenPatternsBuffer.append(String.format("|(?<%s>%s)", tokenType.name(), tokenType.pattern));
+    for (TokenType tokenType : TokenType.values())      
+        tokenPatternsBuffer.append(String.format("|(?<%s>%s)", tokenType.name(), tokenType.pattern));
     Pattern tokenPatterns = Pattern.compile(new String(tokenPatternsBuffer.substring(1)));
 
     Matcher matcher = tokenPatterns.matcher(input);
@@ -64,7 +60,7 @@ public class Lexer
           continue;
         else if (matcher.group(tk.name()) != null)
         {
-          tokens.add(new Token(tk, matcher.group(tk.name())));
+          tokens.add(new Token(tk, matcher.group(tk.name()), matcher.start()));
           continue;
         }
       }
