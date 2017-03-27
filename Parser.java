@@ -16,7 +16,7 @@ public class Parser
     iString = input;
     Lexer aLex = new Lexer();
     handler = aHandler;
-    Parse(aLex.lex(input));
+    Parse(removeQuotes(aLex.lex(input)));
   }
 
   // One of the rules is still broken when testing multi-embedded functions
@@ -26,7 +26,6 @@ public class Parser
     int parCount = 0;
     Lexer.Token cToken;
     Node cNode = root;
-    //System.out.println(tokens);#####################
 
     for (int i = 0; i <= tokensSize; i++){
       cToken = tokens.get(i);
@@ -115,6 +114,7 @@ public class Parser
   {
     Stack<Lexer.Token> evalStack = buildStack();
     ArrayList<String> expr = new ArrayList<String>();
+    ArrayList<String> extraParams = new ArrayList<String>();
     String value = "";
     Lexer.Token temp;
     Lexer.Token newTok;
@@ -127,11 +127,27 @@ public class Parser
       }
       else if (temp.type.name().equals("ID"))
       {
-        addtoFront(expr, temp.data);
-        value = handler.evaluate(expr).toString();
-        newTok = aLex.lex(value).get(0);
-        evalStack.push(newTok);
-        expr = new ArrayList<String>();
+        try {
+          addtoFront(expr, temp.data);
+          if (handler.paramCount(temp.data) == (expr.size() - 1)) {
+            value = handler.evaluate(expr).toString();
+            newTok = aLex.lex(value).get(0);
+            newTok.offset = temp.offset;
+            evalStack.push(newTok);
+            expr.clear();
+          }
+          else if (handler.paramCount(temp.data) != (expr.size() + 1)) {
+            value = evalParams(expr, handler.paramCount(temp.data));
+            newTok = aLex.lex(value).get(0);
+            newTok.offset = temp.offset;
+            evalStack.push(newTok);
+          }
+        }
+        catch (Exception e)
+        {
+          System.out.println("Error at " + temp.data + " offset " + temp.offset);
+          break;
+        }
       }
     } while (!evalStack.empty());
     return value;
@@ -173,6 +189,34 @@ public class Parser
     }
   }
 
+  public ArrayList<Lexer.Token> removeQuotes(ArrayList<Lexer.Token> list)
+  {
+    int size = list.size();
+    Lexer.Token temp;
+
+    for (int i = 0; i < size; i++)
+    {
+      temp = list.get(i);
+      if (temp.type.name().equals("STRING"))
+      {
+        temp.data = temp.data.replaceAll("\"", "");
+        list.remove(i);
+        list.add(i, temp);
+      }
+    }
+    return list;
+  }
+
+  public String evalParams(ArrayList<String> expr, int numParams) throws NoSuchMethodException
+  {
+    ArrayList<String> temp = new ArrayList<String>();
+    for (int i = 0; i <= numParams; i++)
+    {
+      temp.add(expr.get(i));
+      expr.remove(i);
+    }
+    return handler.evaluate(temp).toString();
+  }
 
   // For debugging parse traversal
   public void printParse()
