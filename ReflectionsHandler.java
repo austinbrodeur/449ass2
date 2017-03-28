@@ -41,6 +41,19 @@ public class ReflectionsHandler {
 		}
 	}
 
+	//Returns the number of parameters for a given method.
+	public int paramCount(String name) throws NoSuchMethodException {
+		return findMethod(name).getParameterTypes().length;
+	}
+
+		//Returns the method from the given name from the list of methods.
+	//This method operates under the assumption there are no duplicate named methods.
+	public Method findMethod(String name) throws NoSuchMethodException {
+		for (Method method : methods) {
+			if (method.getName().equals(name)) return method;
+		} throw new NoSuchMethodException();
+	}
+
 
 	//Prints out the list of functions and their parameters and returns.
 	public void functionList() {
@@ -52,16 +65,17 @@ public class ReflectionsHandler {
 		}
 	}
 
+
 	//Evaluates the method and parameters given (given as an ArrayList<String>).
 	public Object evaluate(ArrayList<String> expression) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		String methodName = expression.get(0);
 		expression.remove(0);
 		Method method = (Method) findMethod(methodName, expression);
-		
+
 		int num = expression.size();
 		Class[] paramTypes = method.getParameterTypes();
 		Object[] params = new Object[paramTypes.length];
-		
+
 		if (params.length == num) {
 			for (int i=0; i<num; i++) {
 				if (paramTypes[i].equals(String.class)) {
@@ -71,7 +85,7 @@ public class ReflectionsHandler {
 				} else if (paramTypes[i].equals(float.class) || paramTypes[i].equals(Float.class)) {
 					params[i] = Float.parseFloat(expression.get(i));
 				} else {
-					throw new NoSuchMethodException();			//If the type is different from String, int, or float, error. 
+					throw new NoSuchMethodException();			//If the type is different from String, int, or float, error.
 				}
 			} return method.invoke(null, params);			//If all the parameters match the parses, then invokes method and returns.
 		} throw new NoSuchMethodException();			//If the wrong number of arguments is passed, method dne.
@@ -80,7 +94,7 @@ public class ReflectionsHandler {
 	//Returns the method from the given name from the list of methods.
 	private Object findMethod(String methodName, ArrayList<String> parameters) throws NoSuchMethodException {
 		Class<?>[] paramTypes = new Class<?>[parameters.size()];
-		
+
 		for (int i=0; i<paramTypes.length; i++) {
 			try {
 				Integer.parseInt(parameters.get(i));
@@ -94,11 +108,12 @@ public class ReflectionsHandler {
 				}
 			}
 		}
-		
+
+
 		Method method = objClass.getMethod(methodName, paramTypes);
-		
+
 		if (method == null) throw new NoSuchMethodException();
-		
+
 		return method;
 	}
 

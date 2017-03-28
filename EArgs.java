@@ -157,4 +157,11 @@ public class EArgs
   	System.out.print("^\n");
     System.out.println("Unexpected character encountered at offset " + offset + ".");
   }
+
+  public static void blankError(int offset){
+    for(int i=0; i < (offset); i++){
+      System.out.print("-");
+    }
+    System.out.print("^\n");
+  }
 }

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Stack;
-
+import java.lang.reflect.*;
+import java.lang.Exception;
 
 public class Parser
 {
@@ -26,12 +27,17 @@ public class Parser
     int parCount = 0;
     Lexer.Token cToken;
     Node cNode = root;
-
     for (int i = 0; i <= tokensSize; i++){
       cToken = tokens.get(i);
-      if (cToken.type.name().equals("ERROR")) { //
+      try {
+        if (cToken.type.name().equals("ERROR")) { //
+          throw new ArithmeticException();
+        }
+      } catch (Exception e) {
         System.out.println(iString);
         EArgs.unexpectedError(cToken.offset, cToken.data);
+        if (Mode.verbose == true)
+          e.printStackTrace();
         return;
       }
       if (cToken.type.name().equals("LPAR")) {
@@ -76,8 +82,21 @@ public class Parser
         continue;
       }
     }
-    if (parCount != 0) {
-      System.err.println("Mismatched parenthesis");
+    try {
+      if (parCount != 0) {
+        throw new ArithmeticException();
+      }
+    }
+    catch (Exception e)
+    {
+      System.out.println(iString);
+      if (parCount < 0)
+        EArgs.blankError(0);
+      if (parCount > 0)
+        EArgs.blankError(iString.length() - 1);
+      System.err.println("Error: Mismatched parenthesis.");
+      if (Mode.verbose == true)
+        e.printStackTrace();
       return;
     }
     traverseTree();
@@ -110,7 +129,7 @@ public class Parser
     } while (true);
   }
 
-  public String evaluateTree(ArrayList<Lexer.Token> evalList) throws NoSuchMethodException
+  public String evaluateTree(ArrayList<Lexer.Token> evalList) throws NoSuchMethodException, IllegalAccessException
   {
     Stack<Lexer.Token> evalStack = buildStack();
     ArrayList<String> expr = new ArrayList<String>();
@@ -145,7 +164,11 @@ public class Parser
         }
         catch (Exception e)
         {
-          System.out.println("Error at " + temp.data + " offset " + temp.offset);
+          System.out.println(iString);
+          EArgs.blankError(temp.offset);
+          System.out.println("Error evaluating \"" + temp.data + "\" at offset " + temp.offset);
+          if (Mode.verbose == true)
+            e.printStackTrace();
           break;
         }
       }
@@ -164,7 +187,7 @@ public class Parser
       temp = result.get(i);
       st.push(temp);
     }
-    System.out.println(st);
+    //System.out.println(st);
     return st;
   }
 
@@ -207,7 +230,7 @@ public class Parser
     return list;
   }
 
-  public String evalParams(ArrayList<String> expr, int numParams) throws NoSuchMethodException
+  public String evalParams(ArrayList<String> expr, int numParams) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException
   {
     ArrayList<String> temp = new ArrayList<String>();
     for (int i = 0; i <= numParams; i++)
