@@ -53,46 +53,53 @@ public class ReflectionsHandler {
 	}
 
 	//Evaluates the method and parameters given (given as an ArrayList<String>).
-	public Object evaluate(ArrayList<String> expression) throws NoSuchMethodException {
-		Method method = findMethod(expression.get(0));		//Gets the method.
-		expression.remove(0);								//Removes the method name so it's just parameters left.
-		Class[] paramTypes = method.getParameterTypes();	//Get the parameter types of the method called.
-		Object[] params = new Object[paramTypes.length];	//Create a new Object array to store all the parsed and converted parameters.
-
-		//Try block to create the parameters for the method invocation.
-		try {
-			//Checks if the parameters matches the parameter types and parses them appropriately.
-			if (expression.size() == paramTypes.length) {
-				for(int i=0; i<paramTypes.length; i++) {
-					if (paramTypes[i].equals(String.class)) {
-						params[i] = expression.get(i);
-					} else if (paramTypes[i].equals(int.class) || paramTypes[i].equals(Integer.class)) {
-						params[i] = Integer.parseInt(expression.get(i));
-					} else if (paramTypes[i].equals(float.class) || paramTypes[i].equals(Float.class)) {
-						params[i] = Float.parseFloat(expression.get(i));
-					} else {
-						throw new NoSuchMethodException();
-					}
-				} return method.invoke(null, params);	//If all the parameters match the parses, then invokes method and returns.
-			} else {
-				throw new NoSuchMethodException();		//If the wrong number of arguments is passed, throws NoSuchMethodException.
-			}
-		} catch (Exception e) {
-			throw new NoSuchMethodException();			//If the argument given cannot be parsed properly, it is wrong.
-		}
+	public Object evaluate(ArrayList<String> expression) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		String methodName = expression.get(0);
+		expression.remove(0);
+		Method method = (Method) findMethod(methodName, expression);
+		
+		int num = expression.size();
+		Class[] paramTypes = method.getParameterTypes();
+		Object[] params = new Object[paramTypes.length];
+		
+		if (params.length == num) {
+			for (int i=0; i<num; i++) {
+				if (paramTypes[i].equals(String.class)) {
+					params[i] = expression.get(i);
+				} else if (paramTypes[i].equals(int.class) || paramTypes[i].equals(Integer.class)) {
+					params[i] = Integer.parseInt(expression.get(i));
+				} else if (paramTypes[i].equals(float.class) || paramTypes[i].equals(Float.class)) {
+					params[i] = Float.parseFloat(expression.get(i));
+				} else {
+					throw new NoSuchMethodException();			//If the type is different from String, int, or float, error. 
+				}
+			} return method.invoke(null, params);			//If all the parameters match the parses, then invokes method and returns.
+		} throw new NoSuchMethodException();			//If the wrong number of arguments is passed, method dne.
 	}
 
 	//Returns the method from the given name from the list of methods.
-	//This method operates under the assumption there are no duplicate named methods.
-	public Method findMethod(String name) throws NoSuchMethodException {
-		for (Method method : methods) {
-			if (method.getName().equals(name)) return method;
-		} throw new NoSuchMethodException();
-	}
-
-	//Returns the number of parameters for a given method.
-	public int paramCount(String name) throws NoSuchMethodException {
-		return findMethod(name).getParameterTypes().length;
+	private Object findMethod(String methodName, ArrayList<String> parameters) throws NoSuchMethodException {
+		Class<?>[] paramTypes = new Class<?>[parameters.size()];
+		
+		for (int i=0; i<paramTypes.length; i++) {
+			try {
+				Integer.parseInt(parameters.get(i));
+				paramTypes[i] = int.class;
+			} catch (NumberFormatException e) {
+				try {
+					Float.parseFloat(parameters.get(i));
+					paramTypes[i] = float.class;
+				} catch (NumberFormatException ee) {
+					paramTypes[i] = String.class;
+				}
+			}
+		}
+		
+		Method method = objClass.getMethod(methodName, paramTypes);
+		
+		if (method == null) throw new NoSuchMethodException();
+		
+		return method;
 	}
 
 	//Class test.
