@@ -12,7 +12,6 @@ public class ReflectionsHandler {
 	//Variable declarations.
 	private Class<?> objClass;
 	private String objName;
-	private Class method;
 	private Method[] methods;
 	//private classFinder finder = new classFinder();
 
@@ -33,8 +32,8 @@ public class ReflectionsHandler {
 		}
 
 		try {
-			method = classLoader.loadClass(className);
-			methods = method.getDeclaredMethods();
+			objClass = classLoader.loadClass(className);
+			methods = objClass.getDeclaredMethods();
 		} catch(ClassNotFoundException e) {
 			System.err.println("Could not find class: <" + className + ">");
 			System.exit(-6);
@@ -43,17 +42,45 @@ public class ReflectionsHandler {
 
 	//Returns the number of parameters for a given method.
 	public int paramCount(String name) throws NoSuchMethodException {
-		return findMethod(name).getParameterTypes().length;
+		return locate(name).getParameterTypes().length;
 	}
 
-		//Returns the method from the given name from the list of methods.
-	//This method operates under the assumption there are no duplicate named methods.
-	public Method findMethod(String name) throws NoSuchMethodException {
+	//Returns the method from the given name from the list of methods.
+	public Method locate(String name) throws NoSuchMethodException {
 		for (Method method : methods) {
 			if (method.getName().equals(name)) return method;
 		} throw new NoSuchMethodException();
 	}
 
+	private Class<?>[] cleanParams(String name, Class<?>[] params) {
+		for (Method method : methods) {
+			Class[] temp = method.getParameterTypes();
+			if (temp.length == params.length) {
+				for (int i=0; i<temp.length; i++) {
+					if (temp[i].equals(params[i])){
+						continue;
+					} else if ((temp[i].equals(Integer.class)) && (params[i].equals(int.class))) {
+				//		System.out.println("lf: " + temp[i] + " --- got: " + params[i] + " WORKED");
+						params[i] = Integer.class;
+						continue;
+					} else if ((temp[i].equals(Float.class) && (params[i].equals(float.class)))) {
+			//			System.out.println("lf: " + temp[i] + " --- got: " + params[i] + " WORKED");
+						params[i] = Float.class;
+						continue;
+					} else {
+		//				System.out.println("lf: " + temp[i] + " --- got: " + params[i]);
+						break;
+					}
+				}
+			}
+		} 
+	/*	
+		for(Class p : params) {
+			System.out.println("EACH: -- " + p.getSimpleName());
+		}
+	*/
+		return params;
+	}
 
 	//Prints out the list of functions and their parameters and returns.
 	public void functionList() {
@@ -70,7 +97,7 @@ public class ReflectionsHandler {
 	public Object evaluate(ArrayList<String> expression) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		String methodName = expression.get(0);
 		expression.remove(0);
-		Method method = (Method) findMethod(methodName, expression);
+		Method method = (Method) findActualMethod(methodName, expression);
 
 		int num = expression.size();
 		Class[] paramTypes = method.getParameterTypes();
@@ -92,8 +119,8 @@ public class ReflectionsHandler {
 	}
 
 	//Returns the method from the given name from the list of methods.
-	private Object findMethod(String methodName, ArrayList<String> parameters) throws NoSuchMethodException {
-		Class<?>[] paramTypes = new Class<?>[parameters.size()];
+	private Object findActualMethod(String methodName, ArrayList<String> parameters) throws NoSuchMethodException {
+		Class[] paramTypes = new Class[parameters.size()];
 
 		for (int i=0; i<paramTypes.length; i++) {
 			try {
@@ -108,13 +135,10 @@ public class ReflectionsHandler {
 				}
 			}
 		}
-
-
-		Method method = objClass.getMethod(methodName, paramTypes);
-
-		if (method == null) throw new NoSuchMethodException();
-
-		return method;
+		
+		Method method = objClass.getMethod(methodName, cleanParams(methodName, paramTypes));
+		
+		} return method;
 	}
 
 	//Class test.
