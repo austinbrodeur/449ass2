@@ -138,7 +138,7 @@ public class ReflectionsHandler {
 		
 		Method method = objClass.getMethod(methodName, cleanParams(methodName, paramTypes));
 		
-		} return method;
+		return method;
 	}
 
 	//Class test.
